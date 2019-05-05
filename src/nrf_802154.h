@@ -483,6 +483,16 @@ bool nrf_802154_continuous_carrier(void);
  * @{
  */
 
+#if NRF_802154_RX_STARTED_NOTIFY_ENABLED
+/**
+ * @brief Notify that frame reception has started.
+ *
+ * @note This function should be very short to prevent dropping frames by the driver.
+ *
+ */
+extern void nrf_802154_rx_started(void);
+#endif
+
 /**
  * @brief Notify that transmitting the ACK frame has started.
  *

@@ -531,6 +531,18 @@ extern "C" {
 #endif // NRF_802154_TX_STARTED_NOTIFY_ENABLED
 
 /**
+ * @def NRF_802154_RX_STARTED_NOTIFY_ENABLED
+ *
+ * If notifications of started reception should be enabled in the driver.
+ *
+ */
+#ifndef NRF_802154_RX_STARTED_NOTIFY_ENABLED
+#define NRF_802154_RX_STARTED_NOTIFY_ENABLED 1
+#else
+#define NRF_802154_RX_STARTED_NOTIFY_ENABLED 0
+#endif // NRF_802154_TX_STARTED_NOTIFY_ENABLED
+
+/**
  *@}
  **/
 

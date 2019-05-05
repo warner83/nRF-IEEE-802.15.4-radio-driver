@@ -991,6 +991,9 @@ static void rx_terminate(void)
 #if !NRF_802154_DISABLE_BCC_MATCHING
         ints_to_disable |= NRF_RADIO_INT_BCMATCH_MASK;
 #endif // !NRF_802154_DISABLE_BCC_MATCHING
+#if !NRF_802154_RX_STARTED_NOTIFY_ENABLED
+        ints_to_disable |= NRF_RADIO_INT_FRAMESTART_MASK;
+#endif // !NRF_802154_RX_STARTED_NOTIFY_ENABLED
         ints_to_disable |= NRF_RADIO_INT_CRCOK_MASK;
         nrf_radio_int_disable(ints_to_disable);
         nrf_radio_shorts_set(SHORTS_IDLE);
@@ -1386,6 +1389,11 @@ static void rx_init(bool disabled_was_triggered)
     nrf_radio_event_clear(NRF_RADIO_EVENT_BCMATCH);
     ints_to_enable |= NRF_RADIO_INT_BCMATCH_MASK;
 #endif // !NRF_802154_DISABLE_BCC_MATCHING
+#if NRF_802154_RX_STARTED_NOTIFY_ENABLED
+    nrf_radio_event_clear(NRF_RADIO_EVENT_FRAMESTART);
+    ints_to_enable |= NRF_RADIO_INT_FRAMESTART_MASK;
+#endif // !NRF_802154_RX_STARTED_NOTIFY_ENABLED
+
     nrf_radio_event_clear(NRF_RADIO_EVENT_CRCOK);
     ints_to_enable |= NRF_RADIO_INT_CRCOK_MASK;
     nrf_radio_int_enable(ints_to_enable);
@@ -2730,6 +2738,17 @@ static void irq_handler(void)
 
         nrf_802154_log(EVENT_TRACE_EXIT, FUNCTION_EVENT_EDEND);
     }
+
+#if NRF_802154_RX_STARTED_NOTIFY_ENABLED
+	if (nrf_radio_int_get(NRF_RADIO_INT_FRAMESTART_MASK) &&
+		nrf_radio_event_get(NRF_RADIO_EVENT_FRAMESTART))
+	{
+		nrf_radio_event_clear(NRF_RADIO_EVENT_FRAMESTART);
+
+		if(m_state == RADIO_STATE_RX || m_state == RADIO_STATE_RX_ACK)
+			nrf_802154_rx_started();
+	}
+#endif
 
     nrf_802154_critical_section_exit();
 
